@@ -1,0 +1,54 @@
+plugins {
+    id 'groovy'
+    id 'idea'
+}
+
+group 'org.avalancs.jenkins.globallib'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.5.8'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+    compile group: 'com.cloudbees', name: 'groovy-cps', version: '1.31'
+    testImplementation('org.junit.jupiter:junit-jupiter:5.5.1')
+}
+
+// Jenkins global libraries need source files to be immediately inside the src folder instead of src/main/groovy,
+// and tests should be in a totally different directory
+sourceSets {
+    main.groovy.srcDirs = ['src/']
+    test.groovy.srcDirs = ['test/']
+}
+
+test {
+    useJUnitPlatform()
+    // should fix IntelliJ not picking up on tests, but did not work for me
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+// Ignore @Grab annotations when compiling with gradle, otherwise they are shown as errors
+// instead of adding this in a config file, this hacky code generates it while it is needed during compilation
+compileGroovy {
+    // Create temp file.
+    File temp = File.createTempFile("config", ".groovy")
+
+    // Delete temp file when program exits.
+    temp.deleteOnExit()
+
+    // Write to temp file
+    BufferedWriter out = new BufferedWriter(new FileWriter(temp))
+    out.write("""\
+        withConfig(configuration) {
+            configuration.setDisabledGlobalASTTransformations(['groovy.grape.GrabAnnotationTransformation'] as Set)
+        }
+    """.stripIndent())
+    out.close()
+    groovyOptions.configurationScript = temp
+}
