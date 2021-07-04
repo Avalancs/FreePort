@@ -11,10 +11,10 @@ repositories {
 }
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.5.8'
+    compile 'org.codehaus.groovy:groovy-all:3.0.7'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
-    compile group: 'com.cloudbees', name: 'groovy-cps', version: '1.31'
+    compile 'org.apache.commons:commons-lang3:3.0'
+    compile 'com.cloudbees:groovy-cps:1.31'
     testImplementation('org.junit.jupiter:junit-jupiter:5.5.1')
 }
 
